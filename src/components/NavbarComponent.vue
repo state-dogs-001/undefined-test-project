@@ -24,47 +24,25 @@
 </template>
 
 <script>
+import { mapActions, mapGetters } from "vuex";
+
 export default {
-  data() {
-    return {
-      user: null,
-    };
+  computed: {
+    ...mapGetters(["user"]),
   },
   created() {
+    // Get user when create.
     this.getUser();
   },
   methods: {
-    async getUser() {
-      const req = await fetch("http://localhost:4000/api/check-token", {
-        headers: {
-          "x-access-token": localStorage.getItem("token"),
-        },
-      });
-      const user = await req.json();
-      if (user.status === "error") {
-        localStorage.removeItem("token");
-      } else {
-        this.user = user.user;
-      }
-    },
+    // get user data from token collection database.
+    ...mapActions(["getUser"]),
+
+    // Logout Function
+    ...mapActions(["logout"]),
     async logoutClick() {
       const id = { id: this.user._id };
-
-      const response = await fetch("http://localhost:4000/api/logout", {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(id),
-      });
-
-      const res = await response.json();
-      console.log(res);
-      if (res.status === "ok") {
-        localStorage.removeItem("token");
-        alert("Logout success");
-        window.location.replace("/");
-      }
+      await this.logout(id);
     },
   },
 };

@@ -7,22 +7,5 @@
 </template>
 
 <script>
-import jwt from "jsonwebtoken";
-
-export default {
-  // middleware router
-  beforeCreate() {
-    const token = localStorage.getItem("token");
-    if (token) {
-      const user = jwt.decode(token);
-      // if has token but it determinate
-      if (!user) {
-        localStorage.removeItem("token");
-        window.location.replace("/");
-      }
-    } else {
-      window.location.replace("/");
-    }
-  },
-};
+export default {};
 </script>

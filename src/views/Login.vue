@@ -45,48 +45,24 @@
 </template>
 
 <script>
+import { mapActions } from "vuex";
 export default {
   data() {
     return {
+      // use in email and password value
       email: "arm_1@mail.com",
       password: "55305530",
     };
   },
   methods: {
+    // user login function
+    ...mapActions(["login"]),
     async loginClick() {
       const userEmailPassword = {
         email: this.email,
         password: this.password,
       };
-
-      const response = await fetch("http://localhost:4000/api/sign-in", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(userEmailPassword),
-      });
-
-      const data = await response.json();
-      console.log(data.status);
-
-      // If status ok
-      if (data.status === "ok") {
-        // has user data
-        if (data.user) {
-          localStorage.setItem("token", data.user.token);
-          alert("Login successful");
-          window.location.replace("/main");
-        }
-      }
-      // If has data but token expire out.
-      else if (data.status === "tokenError") {
-        alert(data.message);
-      }
-      // Invalid login
-      else {
-        alert(data.message);
-      }
+      await this.login(userEmailPassword);
     },
   },
 };

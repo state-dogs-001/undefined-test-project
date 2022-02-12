@@ -144,6 +144,8 @@ router.get("/check-token", async (request, response) => {
 router.patch("/update-token", async (request, response) => {
   const id = request.body.id;
   const email = request.body.email;
+  const options = { new: true };
+
   // Create token
   try {
     const newToken = jwt.sign(
@@ -153,7 +155,11 @@ router.patch("/update-token", async (request, response) => {
       "secret",
       { expiresIn: "1d" } // Token expire out in 1 day
     );
-    const res = await tokenTemplate.findByIdAndUpdate(id, { token: newToken });
+    const res = await tokenTemplate.findByIdAndUpdate(
+      id,
+      { token: newToken },
+      options
+    );
     response.json({ status: "ok", user: res });
   } catch (error) {
     response.json(error);
@@ -219,15 +225,11 @@ router.get("/products", async (request, response) => {
 // Update products
 router.patch("/update-product", async (request, response) => {
   const id = request.body.id;
-  const mobile = {
-    product_brand: request.body.product_brand,
-    product_name: request.body.product_name,
-    product_price: request.body.product_price,
-    product_description: request.body.product_description,
-  };
+  const update = request.body;
+  const options = { new: true };
 
   try {
-    await mobileTemplate.findByIdAndUpdate(id, mobile);
+    await mobileTemplate.findByIdAndUpdate(id, update, options);
     response.json({
       status: "ok",
       message: "Update product success",
