@@ -1,32 +1,35 @@
 <template>
   <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
+    <NavbarComponent />
+    <div class="main">
+      <router-view />
     </div>
-    <router-view />
+    <FooterComponent />
   </div>
 </template>
 
+<script>
+import NavbarComponent from "./components/NavbarComponent.vue";
+import FooterComponent from "./components/FooterComponent.vue";
+
+export default {
+  components: {
+    NavbarComponent,
+    FooterComponent,
+  },
+  data() {
+    return {};
+  },
+};
+</script>
+
 <style>
+@import url("https://fonts.googleapis.com/css2?family=Prompt:wght@200&display=swap");
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+  font-family: "Prompt", sans-serif;
+  background-color: rgba(0, 0, 0, 0.1);
 }
-
-#nav {
-  padding: 30px;
-}
-
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-#nav a.router-link-exact-active {
-  color: #42b983;
+.main {
+  min-height: 77vh;
 }
 </style>
