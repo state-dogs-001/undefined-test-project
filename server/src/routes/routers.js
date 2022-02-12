@@ -110,8 +110,8 @@ router.post("/sign-in", (request, response) => {
     });
 });
 
-// Check state auth
-router.get("/check-token", async (request, response) => {
+// Get user from token_col in database
+router.get("/get-user", async (request, response) => {
   const token = request.headers["x-access-token"];
   // find this token in database
   tokenTemplate.findOne({ token: token }).then((data) => {

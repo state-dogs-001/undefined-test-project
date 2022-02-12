@@ -1,5 +1,6 @@
 import Vue from "vue";
 import Vuex from "vuex";
+import jwt from "jsonwebtoken";
 
 Vue.use(Vuex);
 
@@ -88,14 +89,27 @@ export default new Vuex.Store({
 
     // Get user data and token.
     async getUser({ commit }) {
-      const response = await fetch("http://localhost:4000/api/check-token", {
+      const response = await fetch("http://localhost:4000/api/get-user", {
         method: "GET",
         headers: {
           "x-access-token": localStorage.getItem("token"),
         },
       });
+
       const data = await response.json();
-      commit("setUser", data.user);
+
+      // Response status ok
+      if (data.status === "ok") {
+        const token = data.user.token;
+        try {
+          // if token is ok.
+          jwt.verify(token, "secret");
+          commit("setUser", data.user);
+        } catch (error) {
+          // token expire time out
+          commit("setUser", null);
+        }
+      }
     },
 
     // Logout

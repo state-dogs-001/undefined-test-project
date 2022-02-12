@@ -12,13 +12,11 @@ const routes = [
     beforeEnter: (to, from, next) => {
       const token = localStorage.getItem("token");
       if (token) {
-        const user = jwt.decode(token);
-        // if has token but token expire time out.
-        if (!user) {
-          localStorage.removeItem("token");
-          next();
-        } else {
+        try {
+          jwt.verify(token, "secret");
           next({ path: "/main" });
+        } catch (error) {
+          next();
         }
       } else {
         next();
@@ -32,13 +30,11 @@ const routes = [
     beforeEnter: (to, from, next) => {
       const token = localStorage.getItem("token");
       if (token) {
-        const user = jwt.decode(token);
-        // if has token but token expire time out.
-        if (!user) {
-          localStorage.removeItem("token");
-          next({ path: "/" });
-        } else {
+        try {
+          jwt.verify(token, "secret");
           next();
+        } catch (error) {
+          next({ path: "/" });
         }
       } else {
         next({ path: "/" });
