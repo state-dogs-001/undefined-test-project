@@ -11,6 +11,10 @@ const mobileTemplate = mongoose.Schema({
     required: true,
     unique: true,
   },
+  product_img: {
+    type: String,
+    require: true,
+  },
   product_price: {
     type: Number,
     required: true,

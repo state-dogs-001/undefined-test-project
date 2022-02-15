@@ -14,7 +14,7 @@ const routes = [
       if (token) {
         try {
           jwt.verify(token, "secret");
-          next({ path: "/main" });
+          next({ path: "/products" });
         } catch (error) {
           next();
         }
@@ -24,9 +24,45 @@ const routes = [
     },
   },
   {
-    path: "/main",
-    name: "MainPage",
-    component: () => import("../views/MainPage.vue"),
+    path: "/products",
+    name: "Products",
+    component: () => import("../views/Products.vue"),
+    beforeEnter: (to, from, next) => {
+      const token = localStorage.getItem("token");
+      if (token) {
+        try {
+          jwt.verify(token, "secret");
+          next();
+        } catch (error) {
+          next({ path: "/" });
+        }
+      } else {
+        next({ path: "/" });
+      }
+    },
+  },
+  {
+    path: "/add-product",
+    name: "Create Product",
+    component: () => import("../views/product/AddProduct.vue"),
+    beforeEnter: (to, from, next) => {
+      const token = localStorage.getItem("token");
+      if (token) {
+        try {
+          jwt.verify(token, "secret");
+          next();
+        } catch (error) {
+          next({ path: "/" });
+        }
+      } else {
+        next({ path: "/" });
+      }
+    },
+  },
+  {
+    path: "/update-product/:id",
+    name: "Update Product",
+    component: () => import("../views/product/UpdateProduct.vue"),
     beforeEnter: (to, from, next) => {
       const token = localStorage.getItem("token");
       if (token) {

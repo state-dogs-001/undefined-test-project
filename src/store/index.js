@@ -11,7 +11,10 @@ export default new Vuex.Store({
     user: null,
 
     // state product
-    product: null,
+    products: null,
+    addProductStatus: false,
+    updateProductStatus: false,
+    deleteProductStatus: false,
   },
   mutations: {
     // mutate authentication
@@ -24,11 +27,20 @@ export default new Vuex.Store({
 
     // mutate product
     setProduct(state, payload) {
-      state.product = payload;
+      state.products = payload;
+    },
+    setAddProductStatus(state, status) {
+      state.addProductStatus = status;
+    },
+    setUpdateProductStatus(state, status) {
+      state.updateProductStatus = status;
+    },
+    setDeleteProductStatus(state, status) {
+      state.deleteProductStatus = status;
     },
   },
   actions: {
-    // function authentication
+    // ----------------------------------- function authentication ------------------------------------ //
     // Login
     async login({ commit }, userEmailPassword) {
       const response = await fetch("http://localhost:4000/api/sign-in", {
@@ -48,7 +60,7 @@ export default new Vuex.Store({
           localStorage.setItem("token", data.user.token);
           commit("setUserStatus", true);
           alert("Login successful");
-          window.location.replace("/main");
+          window.location.replace("/products");
         }
       }
 
@@ -132,9 +144,104 @@ export default new Vuex.Store({
       }
     },
 
-    // function product
+    // ----------------------------------- function authentication ------------------------------------ //
+
+    // ------------------------------------ function crud product ------------------------------------- //
+    // Get products data
+    async getProducts({ commit }) {
+      const response = await fetch("http://localhost:4000/api/products", {
+        method: "GET",
+      });
+
+      const data = await response.json();
+
+      // If response status is ok
+      if (data.status === "ok") {
+        commit("setProduct", data.data);
+      } else {
+        commit("setProduct", null);
+      }
+    },
+
+    // Add product
+    async addProduct({ commit }, product_info) {
+      const add_response = await fetch(
+        "http://localhost:4000/api/add-product",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-access-token": localStorage.getItem("token"),
+          },
+          body: JSON.stringify(product_info),
+        }
+      );
+
+      const response = await add_response.json();
+      if (response.status === "ok") {
+        commit("setAddProductStatus", true);
+        alert(response.message);
+        window.location.replace("/products");
+      } else {
+        commit("setAddProductStatus", false);
+        alert(response.message);
+      }
+    },
+
+    // Update product
+    async updateProduct({ commit }, product_info) {
+      const update_response = await fetch(
+        "http://localhost:4000/api/update-product",
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            "x-access-token": localStorage.getItem("token"),
+          },
+          body: JSON.stringify(product_info),
+        }
+      );
+
+      const response = await update_response.json();
+      if (response.status === "ok") {
+        commit("setUpdateProductStatus", true);
+        alert(response.message);
+        window.location.replace("/products");
+      } else {
+        commit("setUpdateProductStatus", false);
+        alert(response.message);
+      }
+    },
+
+    // Delete product
+    async deleteProduct({ commit }, id) {
+      const del_response = await fetch(
+        "http://localhost:4000/api/delete-product",
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            "x-access-token": localStorage.getItem("token"),
+          },
+          body: JSON.stringify(id),
+        }
+      );
+
+      const response = await del_response.json();
+      if (response.status === "ok") {
+        commit("setDeleteProductStatus", true);
+        alert(response.message);
+        window.location.reload();
+      } else {
+        commit("setDeleteProductStatus", false);
+        alert(response.message);
+      }
+    },
+
+    // ------------------------------------ function crud product ------------------------------------- //
   },
   getters: {
     user: (state) => state.user,
+    products: (state) => state.products,
   },
 });

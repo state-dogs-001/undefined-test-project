@@ -3,11 +3,11 @@ const router = express.Router();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
-// import auth model
+// ------------------------------------------ import auth model ------------------------------------------ //
 const userTemplate = require("../models/userModel");
 const tokenTemplate = require("../models/tokenModel");
 
-// import products model
+// ---------------------------------------- import products model ---------------------------------------- //
 const mobileTemplate = require("../models/mobileModel");
 
 // -------------------------------------------- Router for auth -------------------------------------------- //
@@ -181,31 +181,42 @@ router.delete("/logout", async (request, response) => {
 
 // ---------------------------------------- Router for CRUD products --------------------------------------- //
 
-// Add products
+// create product
 router.post("/add-product", (request, response) => {
-  const mobile = new mobileTemplate({
-    product_brand: request.body.product_brand,
-    product_name: request.body.product_name,
-    product_price: request.body.product_price,
-    product_description: request.body.product_description,
-  });
+  // If not has token or token is invalid can't create product.
+  const token = request.headers["x-access-token"];
+  try {
+    const decoded = jwt.verify(token, "secret");
+    // if decode success can create product
+    if (decoded) {
+      const mobile = new mobileTemplate({
+        product_brand: request.body.product_brand,
+        product_name: request.body.product_name,
+        product_img: request.body.product_img,
+        product_price: request.body.product_price,
+        product_description: request.body.product_description,
+      });
 
-  mobile
-    .save()
-    .then((data) => {
-      response.json({
-        status: "ok",
-        data: data,
-        message: "Add product success",
-      });
-    })
-    .catch((error) => {
-      response.json({
-        status: "error",
-        error: error,
-        message: "Add product fail",
-      });
-    });
+      mobile
+        .save()
+        .then((data) => {
+          response.json({
+            status: "ok",
+            data: data,
+            message: "Add product success",
+          });
+        })
+        .catch((error) => {
+          response.json({
+            status: "error",
+            error: error,
+            message: "Add product fail",
+          });
+        });
+    }
+  } catch (error) {
+    response.json({ status: "tokenError", error: error });
+  }
 });
 
 // Show products
@@ -224,33 +235,73 @@ router.get("/products", async (request, response) => {
 
 // Update products
 router.patch("/update-product", async (request, response) => {
-  const id = request.body.id;
-  const update = request.body;
-  const options = { new: true };
-
+  // If not has token or token is invalid can't update product.
+  const token = request.headers["x-access-token"];
   try {
-    await mobileTemplate.findByIdAndUpdate(id, update, options);
-    response.json({
-      status: "ok",
-      message: "Update product success",
-    });
+    const decoded = jwt.verify(token, "secret");
+    // if decode success can create product
+    if (decoded) {
+      const id = request.body.id;
+      const update = request.body;
+      const options = { new: true };
+
+      try {
+        const data = await mobileTemplate.findByIdAndUpdate(
+          id,
+          update,
+          options
+        );
+        response.json({
+          status: "ok",
+          message: "Update product success",
+          data: data,
+        });
+      } catch (error) {
+        response.json({
+          status: "error",
+          error: error,
+          message: "Update product fail",
+        });
+      }
+    }
   } catch (error) {
-    response.json({
-      status: "error",
-      error: error,
-      message: "Update product fail",
-    });
+    response.json({ status: "tokenError", error: error });
   }
 });
 
 // Delete products
 router.delete("/delete-product", async (request, response) => {
-  const id = request.body.id;
+  // If not has token or token is invalid can't delete product.
+  const token = request.headers["x-access-token"];
   try {
-    await mobileTemplate.findByIdAndDelete(id);
-    response.json({ status: "ok", message: "Delete product success" });
+    const decoded = jwt.verify(token, "secret");
+    // if decode success can create product
+    if (decoded) {
+      const id = request.body.id;
+      try {
+        //Find product by id once before delete it.
+        const isProduct = await mobileTemplate.findById(id);
+        // Found and delete it
+        if (isProduct) {
+          await mobileTemplate.findByIdAndDelete(id);
+          response.json({ status: "ok", message: "Delete product success." });
+        }
+        // Not found product.
+        else {
+          response.json({
+            status: "error",
+            message: "Can't delete, product not found.",
+          });
+        }
+      } catch (error) {
+        response.json({
+          status: "error",
+          message: "Error, delete fail.",
+        });
+      }
+    }
   } catch (error) {
-    response.json({ status: "error", message: "Error, delete product fail" });
+    response.json({ status: "tokenError", error: error });
   }
 });
 
