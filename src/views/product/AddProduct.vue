@@ -103,12 +103,9 @@ export default {
       productDescription: null,
     };
   },
-  mounted() {
+  updated() {
     // Use for imgae preview
-    let imgInput = document.getElementById("productImg");
-    imgInput.addEventListener("keyup", () => {
-      document.getElementById("imagePreview").src = imgInput.value;
-    });
+    document.getElementById("imagePreview").src = this.productImg;
   },
   methods: {
     // Add product

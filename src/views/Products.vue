@@ -34,7 +34,7 @@
                       <img
                         :src="product.product_img"
                         width="100%"
-                        class="rounded"
+                        class="rounded img-fluid"
                       />
                     </td>
                     <td>{{ product.product_brand }}</td>

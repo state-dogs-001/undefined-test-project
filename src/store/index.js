@@ -89,7 +89,7 @@ export default new Vuex.Store({
         localStorage.setItem("token", newData.user.token);
         commit("setUserStatus", true);
         alert("Login successful");
-        window.location.replace("/main");
+        window.location.replace("/products");
       }
 
       // Invalid login
